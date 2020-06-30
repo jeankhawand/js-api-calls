@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>GET - AJAX</title>
+</head>
+
+<body>
+  <main id="main">
+    <div class="container">
+
+      <h1>Enter a Word</h1>
+
+      <form id="form" autocomplete="off">
+        <input type="text" id="input" value="" placeholder="type in a word">
+
+        <input type="text" id="topic" value="" placeholder="type in a topic">
+        <button id="submit">SUBMIT</button>
+      </form>
+
+      <div id="responseField">
+
+      </div>
+
+    </div>
+  </main>
+  <script src='https://code.jquery.com/jquery-3.1.0.min.js'></script>
+  <script>
+    // Information to reach API
+    const url = 'https://api.datamuse.com/words?';
+    const queryParams = 'rel_jjb=';
+    const additionalParams = '&topics=';
+    // Selecting page elements
+    const inputField = document.querySelector('#input');
+    const topicField = document.querySelector('#topic');
+    const submit = document.querySelector('#submit');
+    const responseField = document.querySelector('#responseField');
+
+    // AJAX function
+    const getSuggestions = () => {
+      const wordQuery = inputField.value;
+      const topicQuery = topicField.value
+      const endpoint = `${url}${queryParams}${wordQuery}${additionalParams}${topicQuery}`;
+
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'json';
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          renderResponse(xhr.response);
+        }
+      }
+
+      xhr.open('GET', endpoint);
+      xhr.send();
+    }
+
+    const displaySuggestions = (event) => {
+      event.preventDefault();
+      getSuggestions();
+    }
+
+    submit.addEventListener('click', displaySuggestions);
+
+  </script>
+  <script>
+    const renderResponse = (res) => {
+      if (!res) {
+        console.log(res.status)
+      }
+      if (!res.length) {
+        responseField.innerHTML = "<p>Try again!</p><p>There were no suggestions found!</p>"
+        return
+      }
+      console.log(res)
+      let wordlist = ""
+      res.forEach(element => {
+        wordlist += `<p>${element.word}</p>`
+      });
+      responseField.innerHTML = wordlist
+
+    }
+
+  </script>
+</body>
+
+</html>
